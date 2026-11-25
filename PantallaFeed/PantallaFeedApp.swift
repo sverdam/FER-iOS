@@ -11,7 +11,7 @@ import SwiftUI
 struct PantallaFeedApp: App {
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            PublicacionesView()
         }
     }
 }
