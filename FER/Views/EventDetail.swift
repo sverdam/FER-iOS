@@ -1,9 +1,3 @@
-//
-//  EventDetail.swift
-//  FER
-//
-//  Created by SOFIA VERDUGO on 24/11/26.
-//
 
 import SwiftUI
 
@@ -54,58 +48,25 @@ struct CircleIconButton: View {
 
 
 struct EventDetail: View {
-    let event: Event
+    @ObservedObject var viewModel: EventViewModel
 
+    let initialEvent: Event
+
+    private var event: Event {
+        viewModel.events.first(where: { $0.id == initialEvent.id }) ?? initialEvent
+    }
+    
+    @Environment(\.dismiss) private var dismiss
+    
     var body: some View {
-        
-
         ZStack {
             Color(.systemBackground)
                 .ignoresSafeArea()
 
             VStack(spacing: 0) {
-
-                // EVENT PHOTO AND BUTTONSbackpack
-                GeometryReader { geometry in
-                    ZStack(alignment: .top) {
-
-                        Image(event.photo)
-                            .resizable()
-                            .scaledToFill()
-                            .frame(
-                                width: geometry.size.width,
-                                height: geometry.size.height
-                            )
-                            .clipped()
-                            .opacity(0.7)
-
-                        // BACK AND SHARE
-                        HStack {
-                            CircleIconButton(
-                                icon: Image(systemName: "chevron.left")
-                            )
-
-                            Spacer()
-                        }
-                        .padding(.horizontal, 20)
-                        .padding(.top, 60)
-
-                        // LIKE
-                        CircleIconButton(
-                            icon: Image(systemName: "heart")
-                        )
-                        .frame(
-                            maxWidth: .infinity,
-                            maxHeight: .infinity,
-                            alignment: .bottomTrailing
-                        )
-                        .padding(.trailing, 20)
-                        .padding(.bottom, 48)
-                    }.background(                                    Color(red: 0.12, green: 0.25, blue: 0.58))
-                }
-                .frame(height: 400)
-
-                // EVENT INFORMATION SHEET
+                header(for: event).navigationBarBackButtonHidden(true)
+                
+                // EVENT INFORMATION
                 ScrollView {
                     VStack(alignment: .leading, spacing: 12) {
 
@@ -246,8 +207,66 @@ struct EventDetail: View {
         }
         .ignoresSafeArea(edges: .top)
     }
+    
+    private func header(for event: Event) -> some View {
+        Color(red: 0.12, green: 0.25, blue: 0.58)
+            .frame(height: 320)
+            .overlay(alignment: .top) {
+                Image(event.photo)
+                    .resizable()
+                    .scaledToFill()
+                    .opacity(0.7)
+                    .allowsHitTesting(false) // the oversized image won't block taps
+            }
+            .clipped()
+            .overlay(alignment: .topLeading) {
+                circleButton(systemName: "chevron.left") { dismiss() }
+                    .padding(.leading, 16)
+                    .padding(.top, 56)
+            }
+            .overlay(alignment: .topTrailing) {
+                HStack(spacing: 12) {
+                    ShareLink(item: event.title) {
+                        circleIcon(systemName: "square.and.arrow.up")
+                    }
+
+                    circleButton(
+                        systemName: event.hasLiked ? "heart.fill" : "heart",
+                        tint: event.hasLiked ? .red : .black
+                    ) {
+                        viewModel.toggleLike(eventId: event.id)
+                    }
+                }
+                .padding(.trailing, 16)
+                .padding(.top, 56)
+            }
+    }
+
+    
+    private func circleButton(systemName: String,
+                              tint: Color = .black,
+                              action: @escaping () -> Void) -> some View {
+        Button(action: action) {
+            circleIcon(systemName: systemName, tint: tint)
+        }
+        .buttonStyle(.plain)
+    }
+
+    private func circleIcon(systemName: String, tint: Color = .black) -> some View {
+        Image(systemName: systemName)
+            .font(.title3)
+            .foregroundStyle(tint)
+            .frame(width: 44, height: 44)
+            .background(.white, in: Circle())
+            .shadow(color: .black.opacity(0.15), radius: 3, y: 1)
+    }
 }
 
 #Preview {
-    EventDetail(event: EventViewModel().events[0])
+    let viewModel = EventViewModel()
+
+    return EventDetail(
+        viewModel: viewModel,
+        initialEvent: viewModel.events[0]
+    )
 }
