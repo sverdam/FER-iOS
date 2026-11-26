@@ -1,11 +1,3 @@
-//
-//  NavBar.swift
-//  PantallaFeed
-//
-//  Created by MAC on 24/11/26.
-//
-
-
 import SwiftUI
 
 enum NavTab: CaseIterable {
@@ -33,7 +25,7 @@ enum NavTab: CaseIterable {
 struct NavBar: View {
     @Binding var selection: NavTab
 
-    private let activeColor = Color(red: 0.13, green: 0.23, blue: 0.53)
+    private let activeColor = AppTheme.accentBlue
 
     var body: some View {
         HStack {

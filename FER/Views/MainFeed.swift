@@ -1,23 +1,16 @@
-//
-//  PublicacionView.swift
-//  PantallaFeed
-//
-//  Created by MAC on 24/11/26.
-//
-
 import SwiftUI
 
-struct PublicacionesView: View {
-    @State private var PostVM = PublicacionesViewModel()
+struct MainFeed: View {
+    @State private var PostVM = PostViewModel()
     @State private var EventVM = EventViewModel()
     @State private var searchText = ""
     @State private var selection: NavTab = .feed
 
-    private let brandBlue = Color(red: 0.13, green: 0.23, blue: 0.53)
+    private let brandBlue = AppTheme.accentBlue
     private let logoName = "fer"
 
     enum FeedItem: Identifiable {
-        case post(Publicacion)
+        case post(Post)
         case event(Event)
 
         var id: String {
@@ -76,7 +69,7 @@ struct PublicacionesView: View {
             NavigationLink {
                 PublicacionDetalle(viewModel: PostVM, postId: post.id)
             } label: {
-                PublicacionCard(content: .post(post)) {
+                ContentCard(content: .post(post)) {
                     PostVM.toggleLike(postId: post.id)
                 }
             }
@@ -89,7 +82,7 @@ struct PublicacionesView: View {
                     initialEvent: event
                 )
             } label: {
-                PublicacionCard(content: .event(event)) {
+                ContentCard(content: .event(event)) {
                     EventVM.toggleLike(eventId: event.id)
                 }
             }
@@ -165,5 +158,5 @@ struct PublicacionesView: View {
 }
 
 #Preview {
-    PublicacionesView()
+    MainFeed()
 }

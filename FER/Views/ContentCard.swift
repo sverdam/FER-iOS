@@ -1,14 +1,7 @@
-//
-//  PublicacionCard.swift
-//  PantallaFeed
-//
-//  Created by MAC on 25/11/26.
-//
-
 import SwiftUI
 
-enum CardContent {
-    case post(Publicacion)
+enum Content {
+    case post(Post)
     case event(Event)
 
     var thumbnail: String? {
@@ -40,8 +33,8 @@ enum CardContent {
     }
 }
 
-struct PublicacionCard: View {
-    let content: CardContent
+struct ContentCard: View {
+    let content: Content
     let onLike: () -> Void
 
     private let imageHeight: CGFloat = 180
@@ -85,9 +78,10 @@ struct PublicacionCard: View {
         Button(action: onLike) {
             Image(systemName: content.hasLiked ? "heart.fill" : "heart")
                 .font(.title3)
-                .foregroundStyle(content.hasLiked ? .red : .primary)
+                .foregroundStyle(content.hasLiked ? .white : .black)
                 .frame(width: 48, height: 48)
-                .background(.white, in: Circle())
+                .background(content.hasLiked ? AppTheme.accentBlue : .white, in: Circle())
+                .animation(.easeInOut(duration: 0.2), value: content.hasLiked)
         }
         .buttonStyle(.plain)
     }

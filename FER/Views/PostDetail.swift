@@ -8,12 +8,12 @@
 import SwiftUI
 
 struct PublicacionDetalle: View {
-    var viewModel: PublicacionesViewModel
+    var viewModel: PostViewModel
     let postId: Int
 
     @Environment(\.dismiss) private var dismiss
 
-    private var post: Publicacion? {
+    private var post: Post? {
         viewModel.posts.first { $0.id == postId }
     }
 
@@ -29,7 +29,7 @@ struct PublicacionDetalle: View {
         }
     }
 
-    private func content(for post: Publicacion) -> some View {
+    private func content(for post: Post) -> some View {
         ZStack {
             Color(.systemBackground)
                 .ignoresSafeArea()
@@ -97,7 +97,7 @@ struct PublicacionDetalle: View {
 
     // MARK: - Fecha
 
-    private func dateText(for post: Publicacion) -> String {
+    private func dateText(for post: Post) -> String {
         let formatted = post.createdAt.formatted(
             .dateTime
                 .day()
@@ -138,7 +138,7 @@ struct PublicacionDetalle: View {
                         Image(systemName: "play.fill")
                             .foregroundStyle(.white)
                             .frame(width: 44, height: 44)
-                            .background(Color(red: 0.13, green: 0.23, blue: 0.53), in: Circle())
+                            .background(AppTheme.accentBlue, in: Circle())
                             .padding(16)
                     }
                     .frame(maxWidth: .infinity)
@@ -194,5 +194,5 @@ struct PublicacionDetalle: View {
 }
 
 #Preview {
-    PublicacionDetalle(viewModel: PublicacionesViewModel(), postId: 1)
+    PublicacionDetalle(viewModel: PostViewModel(), postId: 1)
 }

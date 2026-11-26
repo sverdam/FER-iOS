@@ -1,14 +1,14 @@
 import SwiftUI
 
-// Pantalla 3: Sesión iniciada
-struct SesionIniciadaView: View {
-    let perfil: String
-    let nivel: String
-    let cerrarSesion: () -> Void
+// Screen 3: Session started
+struct SessionView: View {
+    let audience: String
+    let level: String
+    let onChangeProfile: () -> Void
 
     var body: some View {
         VStack(spacing: 0) {
-            LogoFundacion().padding(.top, 40)
+            FoundationLogo().padding(.top, 40)
             Spacer()
 
             Image(systemName: "checkmark.circle.fill")
@@ -17,29 +17,29 @@ struct SesionIniciadaView: View {
                 .padding(.bottom, 20)
 
             Text("¡Sesión iniciada!")
-                .font(Tema.fuente(40, .medium))
+                .font(WelcomeTheme.font(40, .medium))
                 .foregroundStyle(.white)
                 .minimumScaleFactor(0.7)
                 .lineLimit(1)
 
             Text("Tu experiencia ya está personalizada.")
-                .font(Tema.fuente(18))
-                .foregroundStyle(Tema.subtitulo)
+                .font(WelcomeTheme.font(18))
+                .foregroundStyle(WelcomeTheme.subtitle)
                 .multilineTextAlignment(.center)
                 .padding(.top, 4)
 
             VStack(spacing: 10) {
-                FilaDato(titulo: "Perfil", valor: perfil)
-                FilaDato(titulo: "Nivel", valor: nivel)
+                DataRow(title: "Perfil", value: audience)
+                DataRow(title: "Nivel", value: level)
             }
             .padding(.horizontal, 40)
             .padding(.top, 36)
 
             Spacer()
 
-            Button(action: cerrarSesion) {
+            Button(action: onChangeProfile) {
                 Text("Cambiar perfil")
-                    .font(Tema.fuente(18, .medium))
+                    .font(WelcomeTheme.font(18, .medium))
                     .foregroundStyle(.white.opacity(0.85))
                     .underline()
             }
@@ -50,7 +50,7 @@ struct SesionIniciadaView: View {
 
 #Preview {
     ZStack {
-        FondoAzul()
-        SesionIniciadaView(perfil: "Becario", nivel: "Universidad") {}
+        GradientBackground()
+        SessionView(audience: "Becario", level: "Universidad") {}
     }
 }

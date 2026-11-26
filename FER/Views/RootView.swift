@@ -1,53 +1,52 @@
 import SwiftUI
 
-
 struct RootView: View {
-    // Se guardan en UserDefaults. Si ya existen, se salta directo a la sesión.
-    @AppStorage("perfilGuardado") private var perfilGuardado = ""
-    @AppStorage("nivelGuardado") private var nivelGuardado = ""
+    // Stored in UserDefaults. If both exist, skip straight to the session.
+    @AppStorage("savedAudience") private var savedAudience = ""
+    @AppStorage("savedLevel") private var savedLevel = ""
 
-    @State private var paso: Paso
-    @State private var perfilSel: Perfil?
-    @State private var nivelSel: Nivel?
+    @State private var step: Step
+    @State private var selectedAudience: Audience?
+    @State private var selectedLevel: Level?
 
     init() {
-        let d = UserDefaults.standard
-        let hayPerfil = Perfil(rawValue: d.string(forKey: "perfilGuardado") ?? "") != nil
-        let hayNivel = Nivel(rawValue: d.string(forKey: "nivelGuardado") ?? "") != nil
-        _paso = State(initialValue: (hayPerfil && hayNivel) ? .sesion : .perfil)
+        let defaults = UserDefaults.standard
+        let hasAudience = Audience(rawValue: defaults.string(forKey: "savedAudience") ?? "") != nil
+        let hasLevel = Level(rawValue: defaults.string(forKey: "savedLevel") ?? "") != nil
+        _step = State(initialValue: (hasAudience && hasLevel) ? .session : .audience)
     }
 
     var body: some View {
         ZStack {
-            FondoAzul()
+            GradientBackground()
 
-            switch paso {
-            case .perfil:
-                PerfilView(seleccion: $perfilSel) {
-                    cambiar(a: .nivel)
+            switch step {
+            case .audience:
+                AudienceView(selection: $selectedAudience) {
+                    changeStep(to: .level)
                 }
                 .transition(.asymmetric(
                     insertion: .opacity,
                     removal: .move(edge: .leading).combined(with: .opacity)))
 
-            case .nivel:
-                NivelView(seleccion: $nivelSel) {
-                    guard let p = perfilSel, let n = nivelSel else { return }
-                    perfilGuardado = p.rawValue
-                    nivelGuardado = n.rawValue
-                    cambiar(a: .sesion)
+            case .level:
+                LevelView(selection: $selectedLevel) {
+                    guard let audience = selectedAudience, let level = selectedLevel else { return }
+                    savedAudience = audience.rawValue
+                    savedLevel = level.rawValue
+                    changeStep(to: .session)
                 }
                 .transition(.asymmetric(
                     insertion: .move(edge: .trailing).combined(with: .opacity),
                     removal: .move(edge: .leading).combined(with: .opacity)))
 
-            case .sesion:
-                SesionIniciadaView(perfil: perfilGuardado, nivel: nivelGuardado) {
-                    perfilGuardado = ""
-                    nivelGuardado = ""
-                    perfilSel = nil
-                    nivelSel = nil
-                    cambiar(a: .perfil)
+            case .session:
+                SessionView(audience: savedAudience, level: savedLevel) {
+                    savedAudience = ""
+                    savedLevel = ""
+                    selectedAudience = nil
+                    selectedLevel = nil
+                    changeStep(to: .audience)
                 }
                 .transition(.opacity)
             }
@@ -55,9 +54,9 @@ struct RootView: View {
         .preferredColorScheme(.dark)
     }
 
-    private func cambiar(a nuevo: Paso) {
-        withAnimation(.easeInOut(duration: 0.3)) { paso = nuevo }
+    private func changeStep(to newStep: Step) {
+        withAnimation(.easeInOut(duration: 0.3)) { step = newStep }
     }
 }
 
-#Preview("Flujo completo") { RootView() }
+#Preview("Full flow") { RootView() }

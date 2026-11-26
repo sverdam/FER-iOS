@@ -1,10 +1,3 @@
-//
-//  EventViewModel.swift
-//  FER
-//
-//  Created by SOFIA VERDUGO on 24/11/26.
-//
-
 import Foundation
 import Observation
 

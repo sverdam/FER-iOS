@@ -1,14 +1,6 @@
-//
-//  Publicacion.swift
-//  PantallaFeed
-//
-//  Created by MAC on 24/11/26.
-//
-
-
 import Foundation
 
-struct Publicacion: Identifiable {
+struct Post: Identifiable {
     let id: Int
     var documentId: String?
     var title: String?

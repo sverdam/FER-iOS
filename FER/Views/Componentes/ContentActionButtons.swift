@@ -1,10 +1,3 @@
-//
-//  ContentActionButtons.swift
-//  FER
-//
-//  Created by SOFIA VERDUGO on 26/11/26.
-//
-
 import SwiftUI
 
 struct ContentActionButtons: View {
@@ -16,7 +9,7 @@ struct ContentActionButtons: View {
     let onLike: () -> Void
 
     var body: some View {
-        Color(red: 0.12, green: 0.25, blue: 0.58)
+        AppTheme.accentBlue
             .frame(height: 320)
             .overlay(alignment: .top) {
                 if let thumbnail {
@@ -42,7 +35,8 @@ struct ContentActionButtons: View {
 
                     circleButton(
                         systemName: hasLiked ? "heart.fill" : "heart",
-                        tint: hasLiked ? .red : .primary,
+                        tint: hasLiked ? .white : .black,
+                        background: hasLiked ? AppTheme.accentBlue : .white,
                         action: onLike
                     )
                 }
@@ -52,20 +46,24 @@ struct ContentActionButtons: View {
     }
 
     private func circleButton(systemName: String,
-                              tint: Color = .primary,
+                              tint: Color = .black,
+                              background: Color = .white,
                               action: @escaping () -> Void) -> some View {
         Button(action: action) {
-            circleIcon(systemName: systemName, tint: tint)
+            circleIcon(systemName: systemName, tint: tint, background: background)
         }
         .buttonStyle(.plain)
     }
 
-    private func circleIcon(systemName: String, tint: Color = .primary) -> some View {
+    private func circleIcon(systemName: String,
+                            tint: Color = .black,
+                            background: Color = .white) -> some View {
         Image(systemName: systemName)
             .font(.title3)
             .foregroundStyle(tint)
             .frame(width: 44, height: 44)
-            .background(.white, in: Circle())
+            .background(background, in: Circle())
             .shadow(color: .black.opacity(0.15), radius: 3, y: 1)
+            .animation(.easeInOut(duration: 0.2), value: background)
     }
 }
