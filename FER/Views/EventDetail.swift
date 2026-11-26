@@ -56,6 +56,13 @@ struct EventDetail: View {
         viewModel.events.first(where: { $0.id == initialEvent.id }) ?? initialEvent
     }
     
+    private var shareText: String {
+        let formatter = DateFormatter()
+        formatter.locale = Locale(identifier: "es_MX")
+        formatter.dateFormat = "EEEE d 'de' MMMM 'a las' h:mm a"
+        return "\(event.title)\n\(formatter.string(from: event.dateTime))\n\(event.location)"
+    }
+    
     @Environment(\.dismiss) private var dismiss
     
     var body: some View {
@@ -64,7 +71,13 @@ struct EventDetail: View {
                 .ignoresSafeArea()
 
             VStack(spacing: 0) {
-                header(for: event).navigationBarBackButtonHidden(true)
+                ContentActionButtons(
+                    thumbnail: event.photo,
+                    shareText: shareText,
+                    hasLiked: event.hasLiked
+                ) {
+                    viewModel.toggleLike(eventId: event.id)
+                }
                 
                 // EVENT INFORMATION
                 ScrollView {
@@ -204,62 +217,10 @@ struct EventDetail: View {
                 )
                 .padding(.top, -40)
             }
-        }
+        }.navigationBarBackButtonHidden(true)
         .ignoresSafeArea(edges: .top)
     }
-    
-    private func header(for event: Event) -> some View {
-        Color(red: 0.12, green: 0.25, blue: 0.58)
-            .frame(height: 320)
-            .overlay(alignment: .top) {
-                Image(event.photo)
-                    .resizable()
-                    .scaledToFill()
-                    .opacity(0.7)
-                    .allowsHitTesting(false) // the oversized image won't block taps
-            }
-            .clipped()
-            .overlay(alignment: .topLeading) {
-                circleButton(systemName: "chevron.left") { dismiss() }
-                    .padding(.leading, 16)
-                    .padding(.top, 56)
-            }
-            .overlay(alignment: .topTrailing) {
-                HStack(spacing: 12) {
-                    ShareLink(item: event.title) {
-                        circleIcon(systemName: "square.and.arrow.up")
-                    }
 
-                    circleButton(
-                        systemName: event.hasLiked ? "heart.fill" : "heart",
-                        tint: event.hasLiked ? .red : .black
-                    ) {
-                        viewModel.toggleLike(eventId: event.id)
-                    }
-                }
-                .padding(.trailing, 16)
-                .padding(.top, 56)
-            }
-    }
-
-    
-    private func circleButton(systemName: String,
-                              tint: Color = .black,
-                              action: @escaping () -> Void) -> some View {
-        Button(action: action) {
-            circleIcon(systemName: systemName, tint: tint)
-        }
-        .buttonStyle(.plain)
-    }
-
-    private func circleIcon(systemName: String, tint: Color = .black) -> some View {
-        Image(systemName: systemName)
-            .font(.title3)
-            .foregroundStyle(tint)
-            .frame(width: 44, height: 44)
-            .background(.white, in: Circle())
-            .shadow(color: .black.opacity(0.15), radius: 3, y: 1)
-    }
 }
 
 #Preview {

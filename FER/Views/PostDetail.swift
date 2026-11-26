@@ -30,103 +30,70 @@ struct PublicacionDetalle: View {
     }
 
     private func content(for post: Publicacion) -> some View {
-        ScrollView {
-            VStack(alignment: .leading, spacing: 16) {
-                header(for: post)
+        ZStack {
+            Color(.systemBackground)
+                .ignoresSafeArea()
 
-                VStack(alignment: .leading, spacing: 16) {
-                    VStack(alignment: .leading, spacing: 4) {
-                        if let title = post.title {
-                            Text(title)
-                                .font(.title2.weight(.semibold))
-                        }
-                        Text(dateText(for: post))
-                            .font(.subheadline)
-                            .foregroundStyle(.secondary)
-                    }
-
-                    Divider()
-
-                    if let description = post.description {
-                        Text(description)
-                            .font(.body.weight(.medium))
-                    }
-
-                    if !post.body.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
-                        Text(post.body)
-                            .font(.body)
-                    }
-
-                    ForEach(Array(post.attachments.enumerated()), id: \.offset) { _, attachment in
-                        attachmentView(attachment)
-                    }
+            VStack(spacing: 0) {
+                ContentActionButtons(
+                    thumbnail: post.thumbnail,
+                    shareText: post.title ?? post.body,
+                    hasLiked: post.hasLiked
+                ) {
+                    viewModel.toggleLike(postId: post.id)
                 }
-                .padding(.horizontal, 16)
-                .padding(.bottom, 24)
+
+                ScrollView {
+                    VStack(alignment: .leading, spacing: 12) {
+                        VStack(alignment: .leading, spacing: 8) {
+                            if let title = post.title {
+                                Text(title)
+                                    .font(.title3)
+                                    .fontWeight(.bold)
+                                    .foregroundStyle(.primary)
+                            }
+
+                            Text(dateText(for: post))
+                                .font(.body)
+                                .foregroundStyle(.secondary)
+                        }
+
+                        Divider().padding(.vertical, -8)
+
+                        if let description = post.description {
+                            Text(description)
+                                .font(.body.weight(.medium))
+                        }
+
+                        if !post.body.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+                            Text(post.body)
+                                .font(.body)
+                                .foregroundStyle(.secondary)
+                                .lineSpacing(4)
+                        }
+
+                        ForEach(Array(post.attachments.enumerated()), id: \.offset) { _, attachment in
+                            attachmentView(attachment)
+                        }
+                    }
+                    .padding(24)
+                }
+                .background(.white)
+                .foregroundStyle(.black)
+                .clipShape(
+                    UnevenRoundedRectangle(
+                        topLeadingRadius: 40,
+                        topTrailingRadius: 40
+                    )
+                )
+                .padding(.top, -40)
             }
         }
         .ignoresSafeArea(edges: .top)
-        .background(Color(.systemGroupedBackground))
         .navigationBarBackButtonHidden(true)
         .toolbar(.hidden, for: .navigationBar)
     }
 
-    // MARK: - Imagen con botones
-
-    private func header(for post: Publicacion) -> some View {
-        Color(red: 0.12, green: 0.25, blue: 0.58)
-            .frame(height: 320)
-            .overlay(alignment: .top) {
-                if let thumbnail = post.thumbnail {
-                    Image(thumbnail)
-                        .resizable()
-                        .scaledToFill()
-                        .opacity(0.7)
-                } else {
-                    Color.gray.opacity(0.2)
-                }
-            }
-            .clipped()
-            .overlay(alignment: .topLeading) {
-                circleButton(systemName: "chevron.left") { dismiss() }
-                    .padding(.leading, 16)
-                    .padding(.top, 56)
-            }
-            .overlay(alignment: .topTrailing) {
-                HStack(spacing: 12) {
-                    ShareLink(item: post.title ?? post.body) {
-                        circleIcon(systemName: "square.and.arrow.up")
-                    }
-
-                    circleButton(
-                        systemName: post.hasLiked ? "heart.fill" : "heart",
-                        tint: post.hasLiked ? .red : .primary
-                    ) {
-                        viewModel.toggleLike(postId: post.id)
-                    }
-                }
-                .padding(.trailing, 16)
-                .padding(.top, 56)
-            }
-    }
-
-    private func circleButton(systemName: String,
-                              tint: Color = .primary,
-                              action: @escaping () -> Void) -> some View {
-        Button(action: action) {
-            circleIcon(systemName: systemName, tint: tint)
-        }
-        .buttonStyle(.plain)
-    }
-
-    private func circleIcon(systemName: String, tint: Color = .primary) -> some View {
-        Image(systemName: systemName)
-            .font(.title3)
-            .foregroundStyle(tint)
-            .frame(width: 44, height: 44)
-            .background(.white, in: Circle())
-            .shadow(color: .black.opacity(0.15), radius: 3, y: 1)
-    }
 
     // MARK: - Fecha
 
