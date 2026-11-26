@@ -96,9 +96,12 @@ struct MainFeed: View {
                 header
                 
                 Group {
-                    if selection == .feed || selection == .favorites {
+                    switch selection {
+                    case .feed, .favorites:
                         contentList
-                    } else {
+                    case .info:
+                        FaQ()
+                    case .settings:
                         Color.clear
                     }
                 }

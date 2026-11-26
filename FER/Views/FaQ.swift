@@ -8,147 +8,98 @@
 import SwiftUI
 
 struct FaQ: View {
+    @State private var viewModel = FAQViewModel()
     @State private var searchText = ""
-    @State private var selectedFilter = "Todas"
-    @State private var expandedID: UUID? = nil
-    
-    let filters = ["Todas", "Aspirantes", "Becarios"]
-    
-    let faqs: [FAQItem] = [
-        FAQItem(
-            question: "¿Qué niveles educativos cuentan con becas?",
-            answer: "Respuesta de ejemplo para los niveles educativos con beca.",
-            category: "Aspirantes"
-        ),
-        FAQItem(
-            question: "¿Cómo puedo solicitar una beca?",
-            answer: "Para solicitar una beca debes registrarte en la plataforma, completar el formulario y adjuntar los documentos requeridos.",
-            category: "Becarios"
-        ),
-        FAQItem(
-            question: "¿Cuáles son los requisitos para ser becario?",
-            answer: "Los requisitos principales son promedio mínimo, estar inscrito en una institución educativa y no tener otra beca vigente.",
-            category: "Becarios"
-        ),
-        FAQItem(
-            question: "¿Hasta cuándo puedo aplicar?",
-            answer: "Las convocatorias suelen cerrar a finales de cada semestre. Revisa las fechas en la sección de convocatorias.",
-            category: "Aspirantes"
-        ),
-        FAQItem(
-            question: "¿Puedo tener más de una beca al mismo tiempo?",
-            answer: "No, solo se permite una beca vigente por persona. Debes renunciar a la anterior si quieres aplicar a una nueva.",
-            category: "Becarios"
-        ),
-        FAQItem(
-            question: "¿Qué documentos necesito para el registro?",
-            answer: "Identificación oficial, comprobante de domicilio, constancia de estudios y promedio actualizado.",
-            category: "Aspirantes"
-        ),
-        FAQItem(
-            question: "¿Cómo puedo dar seguimiento a mi solicitud?",
-            answer: "Puedes revisar el estado de tu solicitud iniciando sesión con tu correo y contraseña en la sección de Mi Cuenta.",
-            category: "Becarios"
-        )
-    ]
-    
-    var filteredFAQs: [FAQItem] {
-        faqs.filter { item in
-            let matchesFilter = selectedFilter == "Todas" || item.category == selectedFilter
-            let matchesSearch = searchText.isEmpty ||
-                item.question.localizedCaseInsensitiveContains(searchText) ||
-                item.answer.localizedCaseInsensitiveContains(searchText)
-            return matchesFilter && matchesSearch
-        }
+    @State private var selectedFilter: FAQCategoria?
+    @State private var expandedID: Int?
+
+    private var filteredFAQs: [FAQItem] {
+        viewModel.items(matching: searchText, category: selectedFilter)
     }
-    
+
     var body: some View {
         VStack(spacing: 16) {
             Text("Preguntas Frecuentes")
                 .font(.title2)
                 .fontWeight(.semibold)
                 .frame(maxWidth: .infinity, alignment: .leading)
-            
-            SearchBar(text: $searchText)
-            
+
+            FAQSearchBar(text: $searchText)
+
             HStack(spacing: 10) {
-                ForEach(filters, id: \.self) { filter in
-                    FilterButton(
-                        title: filter,
-                        isSelected: selectedFilter == filter
+                FAQFilterButton(title: "Todas", isSelected: selectedFilter == nil) {
+                    selectedFilter = nil
+                }
+
+                ForEach(FAQCategoria.allCases) { category in
+                    FAQFilterButton(
+                        title: category.rawValue,
+                        isSelected: selectedFilter == category
                     ) {
-                        selectedFilter = filter
+                        selectedFilter = category
                     }
                 }
             }
             .frame(maxWidth: .infinity, alignment: .leading)
-            
+
             VStack(spacing: 0) {
                 ScrollView {
                     VStack(spacing: 0) {
-                        ForEach(filteredFAQs) { item in
-                            QuestionElement(
-                                item: item,
-                                isExpanded: expandedID == item.id
-                            ) {
-                                toggleExpansion(item.id)
+                        if filteredFAQs.isEmpty {
+                            Text("Sin resultados")
+                                .foregroundStyle(.secondary)
+                                .frame(maxWidth: .infinity)
+                                .padding(.vertical, 40)
+                        } else {
+                            ForEach(filteredFAQs) { item in
+                                FAQQuestionRow(
+                                    item: item,
+                                    isExpanded: expandedID == item.id
+                                ) {
+                                    expandedID = (expandedID == item.id) ? nil : item.id
+                                }
                             }
                         }
                     }
                 }
             }
-            .background(Color.white)
-            .clipShape(RoundedRectangle(cornerRadius: 12))
-            .shadow(color: .black.opacity(0.05), radius: 4, y: 2)
+            .background(.white)
+            .clipShape(RoundedRectangle(cornerRadius: 24))
+            .shadow(color: .black.opacity(0.08), radius: 4, y: 2)
             .frame(maxHeight: .infinity)
-            
-            ContactBanner()
+
+            FAQContactBanner()
         }
-        .padding(.horizontal, 20)
-        .padding(.vertical, 12)
+        .padding(.horizontal, 16)
+        .padding(.vertical, 16)
+        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
         .background(Color(.systemGroupedBackground))
     }
-    
-    private func toggleExpansion(_ id: UUID) {
-        expandedID = (expandedID == id) ? nil : id
-    }
 }
 
-//Modelos
-struct FAQItem: Identifiable {
-    let id = UUID()
-    let question: String
-    let answer: String
-    let category: String
-}
-
-//Componentes
-struct SearchBar: View {
+private struct FAQSearchBar: View {
     @Binding var text: String
-    
+
     var body: some View {
-        HStack(spacing: 8) {
+        HStack(spacing: 12) {
             Image(systemName: "magnifyingglass")
-                .foregroundStyle(.gray)
-            
+                .font(.title3)
+                .foregroundStyle(.secondary)
+
             TextField("Buscar por palabra clave...", text: $text)
-                .textFieldStyle(.plain)
         }
-        .padding()
-        .background(Color.white)
-        .clipShape(RoundedRectangle(cornerRadius: 25))
-        .overlay(
-            RoundedRectangle(cornerRadius: 25)
-                .stroke(Color.blue, lineWidth: 1.5)
-        )
+        .padding(.horizontal, 20)
+        .padding(.vertical, 14)
+        .background(.white, in: Capsule())
+        .shadow(color: .black.opacity(0.08), radius: 4, y: 2)
     }
 }
 
-struct FilterButton: View {
+private struct FAQFilterButton: View {
     let title: String
     let isSelected: Bool
     let action: () -> Void
-    
+
     var body: some View {
         Button(action: action) {
             Text(title)
@@ -156,22 +107,23 @@ struct FilterButton: View {
                 .fontWeight(.medium)
                 .padding(.horizontal, 16)
                 .padding(.vertical, 8)
-                .background(isSelected ? Color.blue : Color.white)
+                .background(isSelected ? FAQEstilo.marca : .white)
                 .foregroundStyle(isSelected ? .white : .primary)
                 .clipShape(Capsule())
                 .overlay(
                     Capsule()
-                        .stroke(isSelected ? Color.blue : Color.gray.opacity(0.4), lineWidth: 1)
+                        .stroke(isSelected ? FAQEstilo.marca : Color.gray.opacity(0.4), lineWidth: 1)
                 )
         }
+        .buttonStyle(.plain)
     }
 }
 
-struct QuestionElement: View {
+private struct FAQQuestionRow: View {
     let item: FAQItem
     let isExpanded: Bool
     let onToggle: () -> Void
-    
+
     var body: some View {
         VStack(spacing: 0) {
             Button(action: onToggle) {
@@ -181,18 +133,18 @@ struct QuestionElement: View {
                         .fontWeight(.medium)
                         .multilineTextAlignment(.leading)
                         .foregroundStyle(.primary)
-                    
+
                     Spacer()
-                    
+
                     Image(systemName: isExpanded ? "xmark" : "plus")
                         .font(.system(size: 14, weight: .semibold))
-                        .foregroundStyle(.blue)
+                        .foregroundStyle(FAQEstilo.marca)
                 }
                 .padding(.horizontal)
                 .padding(.vertical, 14)
             }
             .buttonStyle(.plain)
-            
+
             if isExpanded {
                 Text(item.answer)
                     .font(.subheadline)
@@ -201,49 +153,53 @@ struct QuestionElement: View {
                     .padding(.bottom, 14)
                     .frame(maxWidth: .infinity, alignment: .leading)
             }
-            
+
             Divider()
                 .padding(.horizontal)
         }
     }
 }
 
-struct ContactBanner: View {
+private struct FAQContactBanner: View {
     var body: some View {
         HStack(spacing: 16) {
             Image(systemName: "questionmark.circle.fill")
                 .font(.system(size: 40))
                 .foregroundStyle(.white)
-            
+
             VStack(alignment: .leading, spacing: 4) {
                 Text("¿Aun tienes dudas?")
                     .font(.headline)
                     .foregroundStyle(.white)
-                
+
                 Text("Estamos aqui para orientarte")
                     .font(.subheadline)
                     .foregroundStyle(.white.opacity(0.9))
-                
+
                 Text("Contactanos por medio de:")
                     .font(.caption)
                     .foregroundStyle(.white.opacity(0.8))
                     .padding(.top, 4)
-                
+
                 Text("celular: 662 212 1453")
                     .font(.caption)
                     .foregroundStyle(.white)
-                
+
                 Text("correo: info@fer.org.mx")
                     .font(.caption)
                     .foregroundStyle(.white)
             }
-            
+
             Spacer()
         }
         .padding()
-        .background(Color.blue)
-        .clipShape(RoundedRectangle(cornerRadius: 16))
+        .background(FAQEstilo.marca)
+        .clipShape(RoundedRectangle(cornerRadius: 24))
     }
+}
+
+private enum FAQEstilo {
+    static let marca = Color(red: 0.13, green: 0.23, blue: 0.53)
 }
 
 #Preview {
