@@ -9,7 +9,7 @@ import Foundation
 import Observation
 
 @Observable
-class EventViewModel {
+class EventViewModel : ObservableObject {
     var events: [Event] = []
     init() {
         loadEvents()
@@ -37,5 +37,11 @@ class EventViewModel {
                 levels: ["Preparatoria", "Universidad", "Maestría"]
             )
         ]
+    }
+    
+    func toggleLike(eventId: Int) {
+        guard let index = events.firstIndex(where: { $0.id == eventId }) else { return }
+        events[index].hasLiked.toggle()
+        events[index].likes = events[index].hasLiked ? 1 : 0
     }
 }
