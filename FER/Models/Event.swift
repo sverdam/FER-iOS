@@ -17,9 +17,8 @@ struct Event: Identifiable {
     let endDateTime: Date
     let cost: String
     let registerLink: String
-    let peopleInterested: Int = 0
-    let likes: Int = 0
-    let hasLiked: Bool = false
+    var likes: Int = 0
+    var hasLiked: Bool = false
     let photo: String
     let createdAt: Date
     let updatedAt: Date
