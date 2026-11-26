@@ -1,4 +1,3 @@
-
 import SwiftUI
 
 struct DetailItem: View {
@@ -12,7 +11,7 @@ struct DetailItem: View {
                 .font(.system(size: 20, weight: .semibold))
                 .foregroundStyle(.white)
                 .frame(width: 40, height: 40)
-                .background(Color(red: 0.12, green: 0.25, blue: 0.58), in: Circle())
+                .background(AppTheme.accentBlue, in: Circle())
 
             VStack(alignment: .leading, spacing: 2) {
                 Text(detailLabel)
@@ -112,7 +111,7 @@ struct EventDetail: View {
                                 .foregroundStyle(.white)
                                 .frame(width: 40, height: 40)
                                 .background(
-                                    Color(red: 0.12, green: 0.25, blue: 0.58),
+                                    AppTheme.accentBlue,
                                     in: RoundedRectangle(cornerRadius: 16)
                                 )
 
@@ -200,7 +199,7 @@ struct EventDetail: View {
                             .foregroundStyle(.white)
                             .padding()
                             .frame(maxWidth: .infinity)
-                            .background(Color(red: 0.12, green: 0.25, blue: 0.58))
+                            .background(AppTheme.accentBlue)
                             .clipShape(RoundedRectangle(cornerRadius: 12))
                         }
                         .buttonStyle(.plain)

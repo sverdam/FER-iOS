@@ -1,15 +1,15 @@
 import SwiftUI
 
-struct LogoFundacion: View {
+struct FoundationLogo: View {
     var body: some View {
-        // Agrega tu logo en Assets con el nombre "logo_fundacion".
+        // Add your logo to Assets with the name "logo_fundacion".
         if UIImage(named: "logo_fundacion") != nil {
             Image("logo_fundacion")
                 .resizable()
                 .scaledToFit()
                 .frame(width: 220)
         } else {
-            // Respaldo en texto mientras no tengas el logo en Assets.
+            // Text fallback while the logo isn't in Assets yet.
             VStack(spacing: 6) {
                 Rectangle().fill(.white.opacity(0.6)).frame(width: 100, height: 1)
                 VStack(spacing: 0) {
@@ -24,37 +24,37 @@ struct LogoFundacion: View {
     }
 }
 
-struct EncabezadoBienvenida: View {
+struct WelcomeHeader: View {
     var body: some View {
         VStack(spacing: 2) {
             Text("¡Bienvenido!")
-                .font(Tema.fuente(52, .medium))
+                .font(WelcomeTheme.font(52, .medium))
                 .foregroundStyle(.white)
                 .minimumScaleFactor(0.7)
                 .lineLimit(1)
             Text("Personaliza tu experiencia.")
-                .font(Tema.fuente(20))
-                .foregroundStyle(Tema.subtitulo)
+                .font(WelcomeTheme.font(20))
+                .foregroundStyle(WelcomeTheme.subtitle)
         }
     }
 }
 
-struct BotonOpcion: View {
-    let titulo: String
-    let seleccionado: Bool
-    let accion: () -> Void
+struct OptionButton: View {
+    let title: String
+    let isSelected: Bool
+    let action: () -> Void
 
     var body: some View {
-        Button(action: accion) {
+        Button(action: action) {
             ZStack {
-                Text(titulo)
-                    .font(Tema.fuente(22, .medium))
-                    .foregroundStyle(Tema.azulTexto)
-                if seleccionado {
+                Text(title)
+                    .font(WelcomeTheme.font(22, .medium))
+                    .foregroundStyle(WelcomeTheme.textBlue)
+                if isSelected {
                     HStack {
                         Spacer()
                         Image(systemName: "checkmark.circle.fill")
-                            .foregroundStyle(Tema.azulClaro)
+                            .foregroundStyle(WelcomeTheme.lightBlue)
                             .padding(.trailing, 16)
                     }
                 }
@@ -63,45 +63,45 @@ struct BotonOpcion: View {
             .frame(height: 50)
             .background(Capsule().fill(.white))
             .overlay(
-                Capsule().stroke(Tema.azulClaro, lineWidth: seleccionado ? 3 : 0)
+                Capsule().stroke(WelcomeTheme.lightBlue, lineWidth: isSelected ? 3 : 0)
             )
         }
         .buttonStyle(.plain)
-        .animation(.easeInOut(duration: 0.15), value: seleccionado)
+        .animation(.easeInOut(duration: 0.15), value: isSelected)
     }
 }
 
-struct BotonContinuar: View {
-    let titulo: String
-    let habilitado: Bool
-    let accion: () -> Void
+struct ContinueButton: View {
+    let title: String
+    let isEnabled: Bool
+    let action: () -> Void
 
     var body: some View {
-        Button(action: accion) {
+        Button(action: action) {
             HStack(spacing: 10) {
-                Text(titulo)
+                Text(title)
                 Image(systemName: "arrow.right")
             }
-            .font(Tema.fuente(20, .medium))
+            .font(WelcomeTheme.font(20, .medium))
             .foregroundStyle(.white.opacity(0.85))
         }
-        .disabled(!habilitado)
-        .opacity(habilitado ? 1 : 0.4)
-        .animation(.easeInOut(duration: 0.2), value: habilitado)
+        .disabled(!isEnabled)
+        .opacity(isEnabled ? 1 : 0.4)
+        .animation(.easeInOut(duration: 0.2), value: isEnabled)
     }
 }
 
-struct FilaDato: View {
-    let titulo: String
-    let valor: String
+struct DataRow: View {
+    let title: String
+    let value: String
 
     var body: some View {
         HStack {
-            Text(titulo).foregroundStyle(Tema.azulTexto.opacity(0.6))
+            Text(title).foregroundStyle(WelcomeTheme.textBlue.opacity(0.6))
             Spacer()
-            Text(valor).foregroundStyle(Tema.azulTexto).fontWeight(.semibold)
+            Text(value).foregroundStyle(WelcomeTheme.textBlue).fontWeight(.semibold)
         }
-        .font(Tema.fuente(20))
+        .font(WelcomeTheme.font(20))
         .padding(.horizontal, 24)
         .frame(height: 50)
         .background(Capsule().fill(.white))
