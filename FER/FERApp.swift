@@ -11,7 +11,7 @@ import SwiftUI
 struct FERApp: App {
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            PublicacionesView()
         }
     }
 }
