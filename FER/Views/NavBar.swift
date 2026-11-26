@@ -9,13 +9,12 @@
 import SwiftUI
 
 enum NavTab: CaseIterable {
-    case feed, favorites, calendar, info, settings
+    case feed, favorites, info, settings
 
     var icon: String {
         switch self {
         case .feed: "house"
         case .favorites: "heart"
-        case .calendar: "calendar"
         case .info: "info.circle"
         case .settings: "gearshape"
         }
@@ -25,7 +24,6 @@ enum NavTab: CaseIterable {
         switch self {
         case .feed: "house.fill"
         case .favorites: "heart.fill"
-        case .calendar: "calendar"
         case .info: "info.circle.fill"
         case .settings: "gearshape.fill"
         }
