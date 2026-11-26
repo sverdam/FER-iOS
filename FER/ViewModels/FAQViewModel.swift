@@ -17,8 +17,8 @@ class FAQViewModel {
         items.filter { item in
             let matchesCategory = category == nil || item.category == category
             let matchesSearch = searchText.isEmpty ||
-                item.question.localizedCaseInsensitiveContains(searchText) ||
-                item.answer.localizedCaseInsensitiveContains(searchText)
+                item.question.localizedStandardContains(searchText) ||
+                item.answer.localizedStandardContains(searchText)
             return matchesCategory && matchesSearch
         }
     }
