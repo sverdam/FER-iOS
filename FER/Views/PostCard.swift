@@ -7,16 +7,50 @@
 
 import SwiftUI
 
+enum CardContent {
+    case post(Publicacion)
+    case event(Event)
+
+    var thumbnail: String? {
+        switch self {
+        case .post(let post): return post.thumbnail
+        case .event(let event): return event.photo
+        }
+    }
+
+    var title: String? {
+        switch self {
+        case .post(let post): return post.title
+        case .event(let event): return event.title
+        }
+    }
+
+    var description: String? {
+        switch self {
+        case .post(let post): return post.description ?? post.body
+        case .event(let event): return event.description
+        }
+    }
+
+    var hasLiked: Bool {
+        switch self {
+        case .post(let post): return post.hasLiked
+        case .event(let event): return event.hasLiked
+        }
+    }
+}
+
 struct PublicacionCard: View {
-    let post: Publicacion
+    let content: CardContent
     let onLike: () -> Void
 
     private let imageHeight: CGFloat = 180
-    private let imageAlignment: Alignment = .top   // prueba .center
+    private let imageAlignment: Alignment = .top
 
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
-            if let thumbnail = post.thumbnail {
+
+            if let thumbnail = content.thumbnail {
                 Color.clear
                     .frame(height: imageHeight)
                     .overlay(alignment: imageAlignment) {
@@ -32,10 +66,10 @@ struct PublicacionCard: View {
             }
 
             VStack(alignment: .leading, spacing: 6) {
-                Text(post.title ?? "")
+                Text(content.title ?? "")
                     .font(.title3.bold())
 
-                Text(post.description ?? post.body)
+                Text(content.description ?? "")
                     .font(.subheadline)
                     .lineLimit(2)
             }
@@ -49,18 +83,12 @@ struct PublicacionCard: View {
 
     private var likeButton: some View {
         Button(action: onLike) {
-            Image(systemName: post.hasLiked ? "heart.fill" : "heart")
+            Image(systemName: content.hasLiked ? "heart.fill" : "heart")
                 .font(.title3)
-                .foregroundStyle(post.hasLiked ? .red : .primary)
+                .foregroundStyle(content.hasLiked ? .red : .primary)
                 .frame(width: 48, height: 48)
                 .background(.white, in: Circle())
         }
         .buttonStyle(.plain)
     }
-}
-
-#Preview {
-    PublicacionCard(post: PublicacionesViewModel().posts[0], onLike: {})
-        .padding()
-        .background(Color(.systemGroupedBackground))
 }
