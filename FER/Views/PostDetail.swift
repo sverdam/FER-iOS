@@ -74,13 +74,14 @@ struct PublicacionDetalle: View {
     // MARK: - Imagen con botones
 
     private func header(for post: Publicacion) -> some View {
-        Color.clear
+        Color(red: 0.12, green: 0.25, blue: 0.58)
             .frame(height: 320)
             .overlay(alignment: .top) {
                 if let thumbnail = post.thumbnail {
                     Image(thumbnail)
                         .resizable()
                         .scaledToFill()
+                        .opacity(0.7)
                 } else {
                     Color.gray.opacity(0.2)
                 }
