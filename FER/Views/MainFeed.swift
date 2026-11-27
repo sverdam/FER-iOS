@@ -54,6 +54,12 @@ struct MainFeed: View {
     var body: some View {
         ScrollView {
             LazyVStack(spacing: 16) {
+                if onlyFavorites {
+                    Text("Mis Likes")
+                        .font(.title2)
+                        .fontWeight(.semibold)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                }
                 searchBar
                 if filteredFeed.isEmpty {
                     Text(onlyFavorites && searchText.isEmpty

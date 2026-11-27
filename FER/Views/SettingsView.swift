@@ -11,7 +11,8 @@ struct SettingsView: View {
             VStack(alignment: .leading, spacing: 16) {
                 Text("Ajustes")
                     .font(.title2)
-                    .padding(.top, 10)
+                    .fontWeight(.semibold)
+                    .frame(maxWidth: .infinity, alignment: .leading)
                 Card {
                     HStack {
                         Text("Sobre ti")
@@ -92,8 +93,7 @@ struct SettingsView: View {
                 }
             }
             .foregroundStyle(AppTheme.textPrimary)
-            .padding(.horizontal, 16)
-            .padding(.bottom, 24)
+            .padding(16)
         }
         .background(AppTheme.background.ignoresSafeArea())
         .dynamicTypeSize(textSize.applied(to: systemTextSize))
