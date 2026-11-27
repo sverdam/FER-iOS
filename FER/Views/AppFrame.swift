@@ -49,7 +49,7 @@ struct AppFrame: View {
         case .info:
             FaQ()
         case .settings:
-            Color.clear  
+            SettingsView()
         }
     }
 }
