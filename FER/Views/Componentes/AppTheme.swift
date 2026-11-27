@@ -3,6 +3,7 @@ import SwiftUI
 enum AppTheme {
     // Brand
     static let accentBlue = Color(red: 0.12, green: 0.25, blue: 0.58)
+    static let destructiveText = Color(red: 0.78, green: 0.16, blue: 0.16)
 
     // Backgrounds
     static let background = Color.dynamic(

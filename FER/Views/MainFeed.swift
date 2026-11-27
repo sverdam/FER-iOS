@@ -102,7 +102,7 @@ struct MainFeed: View {
                     case .info:
                         FaQ()
                     case .settings:
-                        Color.clear
+                        SettingsView()
                     }
                 }
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
