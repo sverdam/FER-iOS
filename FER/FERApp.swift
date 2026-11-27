@@ -5,8 +5,7 @@ import UIKit
 struct FERApp: App {
     var body: some Scene {
         WindowGroup {
-            MainFeed()
-                .modifier(AppearanceApplier())
+            AppFrame().modifier(AppearanceApplier())
         }
     }
 }

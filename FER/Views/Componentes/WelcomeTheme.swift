@@ -1,37 +1,58 @@
 import SwiftUI
 
-// Colors and typography taken from the design screenshots
-enum WelcomeTheme {
-    static let topBlue   = Color(red: 0.17, green: 0.33, blue: 0.56)   // ~#2B5590
-    static let indigo    = Color(red: 0.22, green: 0.22, blue: 0.62)   // ~#38389E
-    static let lightBlue = Color(red: 0.27, green: 0.37, blue: 0.70)   // ~#455EB3
-    static let textBlue  = Color(red: 0.12, green: 0.15, blue: 0.50)   // button text
-    static let subtitle  = Color.white.opacity(0.7)
+enum WelcomeColors {
+    static let bgTop = rgb(0x3A6AC0)
+    static let bgMid = rgb(0x1B3FA8)
+    static let bgBottom = rgb(0x1238BA)
+    static let bgGlow = rgb(0x4A82B8)
+    static let navyText = rgb(0x1E2C7C)
+    static let buttonText = rgb(0x1B3CA8)
+    static let subtitle = rgb(0xD5DCF5)
+    static let squiggleTeal = rgb(0x5DBABB)
+    static let squiggleBlue = rgb(0x2F70DF)
 
-    static func font(_ size: CGFloat, _ weight: Font.Weight = .regular) -> Font {
-        // Uses Montserrat if added to the project; otherwise falls back to the system font.
-        .custom("Montserrat-Regular", size: size).weight(weight)
+    private static func rgb(_ hex: UInt) -> Color {
+        Color(
+            red: Double((hex >> 16) & 0xFF) / 255,
+            green: Double((hex >> 8) & 0xFF) / 255,
+            blue: Double(hex & 0xFF) / 255
+        )
     }
 }
 
-struct GradientBackground: View {
+enum WelcomeFonts {
+    static func poppins(_ size: CGFloat, medium: Bool = true) -> Font {
+        .custom(medium ? "Poppins-Medium" : "Poppins-Regular", size: size)
+    }
+
+    static func cormorant(_ size: CGFloat) -> Font {
+        .custom("CormorantSC-Medium", size: size)
+    }
+}
+
+struct WelcomeBackground: View {
     var body: some View {
-        ZStack {
-            LinearGradient(
-                colors: [WelcomeTheme.topBlue, WelcomeTheme.indigo, WelcomeTheme.topBlue.opacity(0.9)],
-                startPoint: .topLeading, endPoint: .bottomTrailing
-            )
-            RadialGradient(
-                colors: [WelcomeTheme.lightBlue.opacity(0.9), .clear],
-                center: .init(x: 0.95, y: 0.45), startRadius: 0, endRadius: 320
-            )
-            RadialGradient(
-                colors: [WelcomeTheme.indigo.opacity(0.8), .clear],
-                center: .init(x: 0.2, y: 0.85), startRadius: 0, endRadius: 300
-            )
+        GeometryReader { geo in
+            ZStack {
+                LinearGradient(
+                    stops: [
+                        .init(color: WelcomeColors.bgTop, location: 0),
+                        .init(color: WelcomeColors.bgMid, location: 0.45),
+                        .init(color: WelcomeColors.bgBottom, location: 1)
+                    ],
+                    startPoint: .top,
+                    endPoint: .bottom
+                )
+                RadialGradient(
+                    colors: [WelcomeColors.bgGlow, WelcomeColors.bgGlow.opacity(0)],
+                    center: UnitPoint(x: 0.95, y: 0.02),
+                    startRadius: 0,
+                    endRadius: geo.size.width * 0.9
+                )
+            }
         }
         .ignoresSafeArea()
     }
 }
 
-#Preview { GradientBackground() }
+#Preview { WelcomeBackground() }
