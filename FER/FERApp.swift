@@ -4,7 +4,7 @@ import SwiftUI
 struct FERApp: App {
     var body: some Scene {
         WindowGroup {
-            MainFeed()
+            AppFrame()
         }
     }
 }

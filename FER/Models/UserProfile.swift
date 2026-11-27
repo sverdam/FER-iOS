@@ -1,19 +1,22 @@
-import Foundation
+//
+//  UserProfile.swift
+//  FER
+//
+//  Created by MAC on 26/11/26.
+//
 
-enum Audience: String, CaseIterable, Identifiable {
-    case applicant = "Aspirante"
-    case scholar = "Becario"
-    case other = "Otro"
-    var id: String { rawValue }
+struct UserProfile {
+    var audience: String? = nil
+    var level: String? = nil
 }
 
-enum Level: String, CaseIterable, Identifiable {
-    case highSchool = "Preparatoria"
-    case university = "Universidad"
-    case postgraduate = "Posgrado"
-    var id: String { rawValue }
+private extension Set where Element == String {
+    func allows(_ value: String?) -> Bool {
+        guard let value else { return true }
+        return isEmpty || contains(value)
+    }
 }
 
-enum Step {
-    case audience, level, session
+func matchesProfile(audiences: Set<String>, levels: Set<String>, profile: UserProfile) -> Bool {
+    audiences.allows(profile.audience) && levels.allows(profile.level)
 }
