@@ -1,13 +1,11 @@
 import SwiftUI
 
 struct MainFeed: View {
-    @State private var PostVM = PostViewModel()
-    @State private var EventVM = EventViewModel()
-    @State private var searchText = ""
-    @State private var selection: NavTab = .feed
+    let postVM: PostViewModel
+    @ObservedObject var eventVM: EventViewModel
+    let onlyFavorites: Bool
 
-    private let brandBlue = AppTheme.accentBlue
-    private let logoName = "fer"
+    @State private var searchText = ""
 
     enum FeedItem: Identifiable {
         case post(Post)
@@ -15,31 +13,24 @@ struct MainFeed: View {
 
         var id: String {
             switch self {
-            case .post(let post):
-                return "post-\(post.id)"
-            case .event(let event):
-                return "event-\(event.id)"
+            case .post(let post): return "post-\(post.id)"
+            case .event(let event): return "event-\(event.id)"
             }
         }
 
         var createdAt: Date {
             switch self {
-            case .post(let post):
-                return post.createdAt
-            case .event(let event):
-                return event.createdAt
+            case .post(let post): return post.createdAt
+            case .event(let event): return event.createdAt
             }
         }
     }
-    
-    private var filteredFeed: [FeedItem] {
-        let posts = selection == .favorites
-            ? PostVM.likedPosts
-            : PostVM.posts
 
-        let events = selection == .favorites
-            ? EventVM.events.filter { $0.hasLiked }
-            : EventVM.events
+    private var filteredFeed: [FeedItem] {
+        let posts = onlyFavorites ? postVM.likedPosts : postVM.posts
+        let events = onlyFavorites
+            ? eventVM.events.filter { $0.hasLiked }
+            : eventVM.events
 
         let combined: [FeedItem] = posts.map { .post($0) }
             + events.map { .event($0) }
@@ -51,76 +42,21 @@ struct MainFeed: View {
                 case .post(let post):
                     return (post.title ?? "").localizedCaseInsensitiveContains(searchText) ||
                            (post.description ?? "").localizedCaseInsensitiveContains(searchText)
-
                 case .event(let event):
-                    return (event.title).localizedCaseInsensitiveContains(searchText) ||
-                           (event.description).localizedCaseInsensitiveContains(searchText)
+                    return event.title.localizedCaseInsensitiveContains(searchText) ||
+                           event.description.localizedCaseInsensitiveContains(searchText)
                 }
             }
 
         return filtered.sorted { $0.createdAt > $1.createdAt }
     }
-    
-    
-    @ViewBuilder
-    private func feedRow(for item: FeedItem) -> some View {
-        switch item {
-        case .post(let post):
-            NavigationLink {
-                PublicacionDetalle(viewModel: PostVM, postId: post.id)
-            } label: {
-                ContentCard(content: .post(post)) {
-                    PostVM.toggleLike(postId: post.id)
-                }
-            }
-            .buttonStyle(.plain)
-
-        case .event(let event):
-            NavigationLink {
-                EventDetail(
-                    viewModel: EventVM,
-                    initialEvent: event
-                )
-            } label: {
-                ContentCard(content: .event(event)) {
-                    EventVM.toggleLike(eventId: event.id)
-                }
-            }
-            .buttonStyle(.plain)
-        }
-    }
 
     var body: some View {
-        NavigationStack {
-            VStack(spacing: 0) {
-                header
-                
-                Group {
-                    switch selection {
-                    case .feed, .favorites:
-                        contentList
-                    case .info:
-                        FaQ()
-                    case .settings:
-                        Color.clear
-                    }
-                }
-                .frame(maxWidth: .infinity, maxHeight: .infinity)
-                .background(Color(.systemGroupedBackground))
-                .safeAreaInset(edge: .bottom) {
-                    NavBar(selection: $selection)
-                }
-            }
-            .toolbar(.hidden, for: .navigationBar)
-        }
-    }
-
-    private var contentList: some View {
         ScrollView {
             LazyVStack(spacing: 16) {
                 searchBar
                 if filteredFeed.isEmpty {
-                    Text(selection == .favorites && searchText.isEmpty
+                    Text(onlyFavorites && searchText.isEmpty
                          ? "Aún no tienes favoritos"
                          : "Sin resultados")
                         .foregroundStyle(.secondary)
@@ -131,19 +67,33 @@ struct MainFeed: View {
                     }
                 }
             }
-            .padding(.horizontal, 16)
-            .padding(.vertical, 16)
+            .padding(16)
         }
     }
 
-    private var header: some View {
-        Image(logoName)
-            .resizable()
-            .scaledToFit()
-            .frame(height: 60)
-            .frame(maxWidth: .infinity)
-            .padding(.vertical, 8)
-            .background(brandBlue.ignoresSafeArea(edges: .top))
+    @ViewBuilder
+    private func feedRow(for item: FeedItem) -> some View {
+        switch item {
+        case .post(let post):
+            NavigationLink {
+                PublicacionDetalle(viewModel: postVM, postId: post.id)
+            } label: {
+                ContentCard(content: .post(post)) {
+                    postVM.toggleLike(postId: post.id)
+                }
+            }
+            .buttonStyle(.plain)
+
+        case .event(let event):
+            NavigationLink {
+                EventDetail(viewModel: eventVM, initialEvent: event)
+            } label: {
+                ContentCard(content: .event(event)) {
+                    eventVM.toggleLike(eventId: event.id)
+                }
+            }
+            .buttonStyle(.plain)
+        }
     }
 
     private var searchBar: some View {
@@ -161,5 +111,7 @@ struct MainFeed: View {
 }
 
 #Preview {
-    MainFeed()
+    NavigationStack {
+        MainFeed(postVM: PostViewModel(), eventVM: EventViewModel(), onlyFavorites: false)
+    }
 }
